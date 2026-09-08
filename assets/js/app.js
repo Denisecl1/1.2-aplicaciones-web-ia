@@ -1,4 +1,4 @@
-const API_URL = "https://1-2-aplicaciones-web-ia-mdou.vercel.app/api/chat";
+const API_URL = "https://1-2-aplicaciones-web-ia-1p4u.vercel.app/api/chat";
 
 const form = document.getElementById("chatForm");
 const input = document.getElementById("messageInput");
