@@ -9,13 +9,21 @@
 <body>
 
    <main class="app">
-       <header class="header">
-           <div>
-               <h1>Chat IA</h1>
-               <p>Inteligencia Artificial aplicada a las TIC</p>
-           </div>
-           <span class="status">● IA disponible</span>
-       </header>
+       ```html
+<header class="header">
+    <div>
+        <h1>Chat IA</h1>
+        <p>Inteligencia Artificial aplicada a las TIC</p>
+    </div>
+
+    <div class="header-actions">
+        <span class="status">● IA disponible</span>
+        <button id="newChatButton" type="button">
+            Nueva conversación
+        </button>
+    </div>
+</header>
+
 
        <section id="messages" class="messages" aria-live="polite">
            <div class="message assistant">

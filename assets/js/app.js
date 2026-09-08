@@ -5,6 +5,7 @@ const input = document.getElementById("messageInput");
 const messages = document.getElementById("messages");
 const sendButton = document.getElementById("sendButton");
 const characterCount = document.getElementById("characterCount");
+const newChatButton = document.getElementById("newChatButton");
 
 input.addEventListener("input", () => {
    characterCount.textContent =
@@ -31,6 +32,32 @@ function addMessage(text, type) {
 
    return container;
 }
+
+function newConversation() {
+   // Eliminar todos los mensajes actuales
+   messages.innerHTML = "";
+
+   // Restaurar el saludo inicial
+   addMessage(
+       "Hola. Soy tu asistente de Inteligencia Artificial. ¿En qué puedo ayudarte?",
+       "assistant"
+   );
+
+   // Limpiar el campo de texto
+   input.value = "";
+
+   // Restaurar el contador
+   characterCount.textContent = "0 / 1000";
+
+   // Asegurar que el campo esté disponible
+   input.disabled = false;
+   sendButton.disabled = false;
+
+   // Colocar el cursor en el campo
+   input.focus();
+}
+
+newChatButton.addEventListener("click", newConversation);
 
 form.addEventListener("submit", async (event) => {
    event.preventDefault();
