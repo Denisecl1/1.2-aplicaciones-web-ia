@@ -7,6 +7,8 @@ const sendButton = document.getElementById("sendButton");
 const characterCount = document.getElementById("characterCount");
 const newChatButton = document.getElementById("newChatButton");
 
+let conversationHistory = [];
+
 input.addEventListener("input", () => {
    characterCount.textContent =
        `${input.value.length} / 1000`;
@@ -36,6 +38,8 @@ function addMessage(text, type) {
 function newConversation() {
    // Eliminar todos los mensajes actuales
    messages.innerHTML = "";
+
+   conversationHistory = [];
 
    // Restaurar el saludo inicial
    addMessage(
@@ -70,6 +74,11 @@ form.addEventListener("submit", async (event) => {
 
    addMessage(message, "user");
 
+   conversationHistory.push({
+   role: "user",
+   content: message
+});
+
    input.value = "";
    input.disabled = true;
    sendButton.disabled = true;
@@ -83,8 +92,9 @@ form.addEventListener("submit", async (event) => {
                "Content-Type": "application/json"
            },
            body: JSON.stringify({
-               message: message
-           })
+   message: message,
+   history: conversationHistory
+})
        });
 
        const data = await response.json();
@@ -98,6 +108,10 @@ form.addEventListener("submit", async (event) => {
        }
 
        addMessage(data.reply, "assistant");
+       conversationHistory.push({
+   role: "assistant",
+   content: data.reply
+});
    }
    catch (error) {
        loading.remove();
