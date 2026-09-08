@@ -39,6 +39,7 @@ function newConversation() {
    // Eliminar todos los mensajes actuales
    messages.innerHTML = "";
 
+   // Limpiar historial conversacional
    conversationHistory = [];
 
    // Restaurar el saludo inicial
@@ -74,10 +75,11 @@ form.addEventListener("submit", async (event) => {
 
    addMessage(message, "user");
 
+   // Guardar mensaje del usuario
    conversationHistory.push({
-   role: "user",
-   content: message
-});
+       role: "user",
+       content: message
+   });
 
    input.value = "";
    input.disabled = true;
@@ -92,35 +94,89 @@ form.addEventListener("submit", async (event) => {
                "Content-Type": "application/json"
            },
            body: JSON.stringify({
-   message: message,
-   history: conversationHistory
-})
+               message: message,
+               history: conversationHistory
+           })
        });
 
        const data = await response.json();
 
        loading.remove();
 
+       // ==========================================
+       // RETO 5 - MANEJO DE ERRORES
+       // ==========================================
+
        if (!response.ok) {
-           throw new Error(
-               data.error || "Error del servidor"
-           );
+
+           let errorMessage;
+
+           switch (response.status) {
+
+               case 400:
+                   errorMessage =
+                       "Error 400: Solicitud incorrecta. " +
+                       (data.error ||
+                        "Los datos enviados no son válidos.");
+                   break;
+
+               case 403:
+                   errorMessage =
+                       "Error 403: Acceso prohibido. " +
+                       (data.error ||
+                        "No tienes permiso para realizar esta solicitud.");
+                   break;
+
+               case 413:
+                   errorMessage =
+                       "Error 413: Petición demasiado grande. " +
+                       (data.error ||
+                        "La información enviada supera el límite permitido.");
+                   break;
+
+               case 500:
+                   errorMessage =
+                       "Error 500: Error interno del servidor. " +
+                       (data.error ||
+                        "No fue posible procesar la solicitud.");
+                   break;
+
+               default:
+                   errorMessage =
+                       `Error ${response.status}: ` +
+                       (data.error ||
+                        "Ocurrió un error inesperado.");
+           }
+
+           throw new Error(errorMessage);
        }
 
+       // ==========================================
+       // RESPUESTA CORRECTA
+       // ==========================================
+
        addMessage(data.reply, "assistant");
+
+       // Guardar respuesta de la IA
        conversationHistory.push({
-   role: "assistant",
-   content: data.reply
-});
+           role: "assistant",
+           content: data.reply
+       });
+
    }
    catch (error) {
-       loading.remove();
+
+       // Evitar error si loading ya no existe
+       if (loading.parentNode) {
+           loading.remove();
+       }
 
        addMessage(
-           "Error: " + error.message,
+           error.message,
            "assistant"
        );
    }
+
    finally {
        input.disabled = false;
        sendButton.disabled = false;
