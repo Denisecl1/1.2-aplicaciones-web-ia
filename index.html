@@ -28,16 +28,19 @@
        </section>
 
        <form id="chatForm" class="chat-form">
-           <input
-               id="messageInput"
-               type="text"
-               maxlength="1000"
-               placeholder="Escribe una pregunta..."
-               autocomplete="off"
-               required
-           >
-           <button id="sendButton" type="submit">Enviar</button>
-       </form>
+    <input
+        id="messageInput"
+        type="text"
+        maxlength="1000"
+        placeholder="Escribe una pregunta..."
+        autocomplete="off"
+        required
+    >
+
+    <div id="characterCount">0 / 1000</div>
+
+    <button id="sendButton" type="submit">Enviar</button>
+</form>
    </main>
 
    <script src="assets/js/app.js"></script>

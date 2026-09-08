@@ -4,6 +4,12 @@ const form = document.getElementById("chatForm");
 const input = document.getElementById("messageInput");
 const messages = document.getElementById("messages");
 const sendButton = document.getElementById("sendButton");
+const characterCount = document.getElementById("characterCount");
+
+input.addEventListener("input", () => {
+   characterCount.textContent =
+       `${input.value.length} / 1000`;
+});
 
 function addMessage(text, type) {
    const container = document.createElement("div");
