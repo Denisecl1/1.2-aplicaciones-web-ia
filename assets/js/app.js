@@ -21,7 +21,6 @@ input.addEventListener("input", () => {
 
 function formatInlineMarkdown(text, element) {
 
-   // Dividir el texto en partes con formato
    const parts = text.split(
        /(\*\*.*?\*\*|__.*?__|\*.*?\*|_.*?_|`.*?`)/g
    );
@@ -37,8 +36,12 @@ function formatInlineMarkdown(text, element) {
            part.startsWith("**") &&
            part.endsWith("**")
        ) {
-           const strong = document.createElement("strong");
-           strong.textContent = part.slice(2, -2);
+           const strong =
+               document.createElement("strong");
+
+           strong.textContent =
+               part.slice(2, -2);
+
            element.appendChild(strong);
        }
 
@@ -47,8 +50,12 @@ function formatInlineMarkdown(text, element) {
            part.startsWith("__") &&
            part.endsWith("__")
        ) {
-           const strong = document.createElement("strong");
-           strong.textContent = part.slice(2, -2);
+           const strong =
+               document.createElement("strong");
+
+           strong.textContent =
+               part.slice(2, -2);
+
            element.appendChild(strong);
        }
 
@@ -57,8 +64,12 @@ function formatInlineMarkdown(text, element) {
            part.startsWith("*") &&
            part.endsWith("*")
        ) {
-           const em = document.createElement("em");
-           em.textContent = part.slice(1, -1);
+           const em =
+               document.createElement("em");
+
+           em.textContent =
+               part.slice(1, -1);
+
            element.appendChild(em);
        }
 
@@ -67,8 +78,12 @@ function formatInlineMarkdown(text, element) {
            part.startsWith("_") &&
            part.endsWith("_")
        ) {
-           const em = document.createElement("em");
-           em.textContent = part.slice(1, -1);
+           const em =
+               document.createElement("em");
+
+           em.textContent =
+               part.slice(1, -1);
+
            element.appendChild(em);
        }
 
@@ -77,8 +92,12 @@ function formatInlineMarkdown(text, element) {
            part.startsWith("`") &&
            part.endsWith("`")
        ) {
-           const code = document.createElement("code");
-           code.textContent = part.slice(1, -1);
+           const code =
+               document.createElement("code");
+
+           code.textContent =
+               part.slice(1, -1);
+
            element.appendChild(code);
        }
 
@@ -103,12 +122,11 @@ function renderMarkdown(text, container) {
 
        const trimmed = line.trim();
 
+
        // Línea vacía
        if (!trimmed) {
-
            currentList = null;
            currentListType = null;
-
            return;
        }
 
@@ -119,15 +137,16 @@ function renderMarkdown(text, container) {
 
        if (trimmed.startsWith("```")) {
 
-           const codeBlock = document.createElement("pre");
-           const code = document.createElement("code");
+           const codeBlock =
+               document.createElement("pre");
+
+           const code =
+               document.createElement("code");
 
            code.classList.add("code-block");
 
-           code.textContent = trimmed.replace(
-               /^```/,
-               ""
-           );
+           code.textContent =
+               trimmed.replace(/^```/, "");
 
            codeBlock.appendChild(code);
            container.appendChild(codeBlock);
@@ -137,7 +156,7 @@ function renderMarkdown(text, container) {
 
 
        // =================================================
-       // TITULOS
+       // TÍTULOS
        // =================================================
 
        const headingMatch =
@@ -272,7 +291,7 @@ function renderMarkdown(text, container) {
 
 
        // =================================================
-       // LINEA SEPARADORA
+       // LÍNEA SEPARADORA
        // =================================================
 
        if (
@@ -292,7 +311,7 @@ function renderMarkdown(text, container) {
 
 
        // =================================================
-       // PARRAFO
+       // PÁRRAFO
        // =================================================
 
        currentList = null;
@@ -314,6 +333,34 @@ function renderMarkdown(text, container) {
 
 
 // =====================================================
+// COPIAR RESPUESTA
+// =====================================================
+
+async function copyResponse(text, button) {
+
+   try {
+
+       await navigator.clipboard.writeText(text);
+
+       button.textContent = "✓ Copiado";
+
+       setTimeout(() => {
+           button.textContent = "📋 Copiar";
+       }, 1500);
+
+   }
+   catch (error) {
+
+       button.textContent = "Error";
+
+       setTimeout(() => {
+           button.textContent = "📋 Copiar";
+       }, 1500);
+   }
+}
+
+
+// =====================================================
 // AGREGAR MENSAJE
 // =====================================================
 
@@ -327,6 +374,11 @@ function addMessage(text, type) {
        type
    );
 
+
+   // =================================================
+   // ETIQUETA
+   // =================================================
+
    const label =
        document.createElement("div");
 
@@ -339,6 +391,11 @@ function addMessage(text, type) {
            ? "Tú"
            : "IA";
 
+
+   // =================================================
+   // CONTENIDO
+   // =================================================
+
    const content =
        document.createElement("div");
 
@@ -347,7 +404,7 @@ function addMessage(text, type) {
    );
 
 
-   // La IA usa Markdown
+   // Las respuestas de IA usan Markdown
    if (type === "assistant") {
 
        renderMarkdown(
@@ -356,22 +413,97 @@ function addMessage(text, type) {
        );
 
    }
-
-   // Usuario y otros mensajes
    else {
 
-       content.textContent = text;
-
+       content.textContent =
+           text;
    }
 
 
    container.appendChild(label);
    container.appendChild(content);
 
-   messages.appendChild(container);
+
+   // =================================================
+   // HORA DEL MENSAJE
+   // =================================================
+
+   const messageInfo =
+       document.createElement("div");
+
+   messageInfo.classList.add(
+       "message-info"
+   );
+
+
+   const time =
+       document.createElement("span");
+
+   time.classList.add(
+       "message-time"
+   );
+
+   time.textContent =
+       new Date().toLocaleTimeString(
+           "es-MX",
+           {
+               hour: "2-digit",
+               minute: "2-digit"
+           }
+       );
+
+   messageInfo.appendChild(time);
+
+
+   // =================================================
+   // BOTÓN COPIAR
+   // =================================================
+
+   // Solo aparece en mensajes de IA
+   if (type === "assistant") {
+
+       const copyButton =
+           document.createElement("button");
+
+       copyButton.type =
+           "button";
+
+       copyButton.classList.add(
+           "copy-button"
+       );
+
+       copyButton.textContent =
+           "📋 Copiar";
+
+       copyButton.addEventListener(
+           "click",
+           () => {
+               copyResponse(
+                   text,
+                   copyButton
+               );
+           }
+       );
+
+       messageInfo.appendChild(
+           copyButton
+       );
+   }
+
+
+   container.appendChild(
+       messageInfo
+   );
+
+
+   messages.appendChild(
+       container
+   );
+
 
    messages.scrollTop =
        messages.scrollHeight;
+
 
    return container;
 }
@@ -383,20 +515,26 @@ function addMessage(text, type) {
 
 function newConversation() {
 
+   // Eliminar mensajes visuales
    messages.innerHTML = "";
 
+   // Eliminar historial
    conversationHistory = [];
 
+   // Restaurar saludo inicial
    addMessage(
        "Hola. Soy tu asistente de Inteligencia Artificial. ¿En qué puedo ayudarte?",
        "assistant"
    );
 
+   // Limpiar input
    input.value = "";
 
+   // Reiniciar contador
    characterCount.textContent =
        "0 / 1000";
 
+   // Habilitar controles
    input.disabled = false;
    sendButton.disabled = false;
 
@@ -435,18 +573,25 @@ form.addEventListener(
        );
 
 
-       // Guardar en historial
+       // =================================================
+       // HISTORIAL CONVERSACIONAL
+       // =================================================
+
        conversationHistory.push({
            role: "user",
            content: message
        });
 
 
+       // Limpiar input
        input.value = "";
+
+       // Deshabilitar mientras responde
        input.disabled = true;
        sendButton.disabled = true;
 
 
+       // Mostrar "Pensando..."
        const loading =
            addMessage(
                "Pensando...",
@@ -482,11 +627,12 @@ form.addEventListener(
                await response.json();
 
 
+           // Eliminar "Pensando..."
            loading.remove();
 
 
            // =================================================
-           // MANEJO DE ERRORES
+           // RETO 5 - MANEJO DE ERRORES
            // =================================================
 
            if (!response.ok) {
@@ -498,42 +644,55 @@ form.addEventListener(
                ) {
 
                    case 400:
+
                        errorMessage =
                            "Error 400: Solicitud incorrecta. " +
                            (
                                data.error ||
                                "Los datos enviados no son válidos."
                            );
+
                        break;
 
+
                    case 403:
+
                        errorMessage =
                            "Error 403: Acceso prohibido. " +
                            (
                                data.error ||
                                "El origen de la solicitud no está autorizado."
                            );
+
                        break;
 
+
                    case 413:
+
                        errorMessage =
                            "Error 413: Petición demasiado grande. " +
                            (
                                data.error ||
                                "La información enviada supera el límite permitido."
                            );
+
                        break;
 
+
                    case 500:
+
                        errorMessage =
                            "Error 500: Error interno del servidor. " +
                            (
                                data.error ||
                                "No fue posible procesar la solicitud."
                            );
+
                        break;
 
+
                    default:
+
                        errorMessage =
                            `Error ${response.status}: ` +
                            (
@@ -559,7 +718,7 @@ form.addEventListener(
            );
 
 
-           // Guardar respuesta
+           // Guardar respuesta en historial
            conversationHistory.push({
                role: "assistant",
                content: data.reply
@@ -574,7 +733,6 @@ form.addEventListener(
            ) {
                loading.remove();
            }
-
 
            addMessage(
                error.message,

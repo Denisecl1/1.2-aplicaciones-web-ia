@@ -308,3 +308,54 @@ body {
     font-family: monospace;
     white-space: pre-wrap;
 }
+
+/* ==========================================
+   HORA DE LOS MENSAJES
+   ========================================== */
+
+.message-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.message-time {
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+
+/* ==========================================
+   BOTÓN COPIAR
+   ========================================== */
+.copy-button {
+    display: inline-block;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background: #050505; /* Fondo oscuro para la terminal */
+    color: #00ff41; /* Texto verde neón */
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 40px; /* Esto le da la forma de píldora redondeada */
+    
+    /* El efecto exacto de tu CSS original, adaptado a Ciberseguridad */
+    box-shadow: #00ff41 -2px -2px 0px 2px, #00ffff 0px 0px 0px 4px;
+    transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+    /* Al pasar el mouse, los colores del borde se invierten */
+    box-shadow: #00ffff -2px -2px 0px 2px, #00ff41 0px 0px 0px 4px;
+    transform: scale(1.02);
+    color: #00ffff; /* El texto se vuelve cian para darle más dinamismo */
+}
+
+.copy-button:active {
+    transform: scale(0.98);
+}
