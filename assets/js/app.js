@@ -14,172 +14,580 @@ input.addEventListener("input", () => {
        `${input.value.length} / 1000`;
 });
 
+
+// =====================================================
+// FORMATO MARKDOWN
+// =====================================================
+
+function formatInlineMarkdown(text, element) {
+
+   // Dividir el texto en partes con formato
+   const parts = text.split(
+       /(\*\*.*?\*\*|__.*?__|\*.*?\*|_.*?_|`.*?`)/g
+   );
+
+   parts.forEach(part => {
+
+       if (!part) {
+           return;
+       }
+
+       // Negrita **texto**
+       if (
+           part.startsWith("**") &&
+           part.endsWith("**")
+       ) {
+           const strong = document.createElement("strong");
+           strong.textContent = part.slice(2, -2);
+           element.appendChild(strong);
+       }
+
+       // Negrita __texto__
+       else if (
+           part.startsWith("__") &&
+           part.endsWith("__")
+       ) {
+           const strong = document.createElement("strong");
+           strong.textContent = part.slice(2, -2);
+           element.appendChild(strong);
+       }
+
+       // Cursiva *texto*
+       else if (
+           part.startsWith("*") &&
+           part.endsWith("*")
+       ) {
+           const em = document.createElement("em");
+           em.textContent = part.slice(1, -1);
+           element.appendChild(em);
+       }
+
+       // Cursiva _texto_
+       else if (
+           part.startsWith("_") &&
+           part.endsWith("_")
+       ) {
+           const em = document.createElement("em");
+           em.textContent = part.slice(1, -1);
+           element.appendChild(em);
+       }
+
+       // Código `texto`
+       else if (
+           part.startsWith("`") &&
+           part.endsWith("`")
+       ) {
+           const code = document.createElement("code");
+           code.textContent = part.slice(1, -1);
+           element.appendChild(code);
+       }
+
+       // Texto normal
+       else {
+           element.appendChild(
+               document.createTextNode(part)
+           );
+       }
+   });
+}
+
+
+function renderMarkdown(text, container) {
+
+   const lines = text.split("\n");
+
+   let currentList = null;
+   let currentListType = null;
+
+   lines.forEach(line => {
+
+       const trimmed = line.trim();
+
+       // Línea vacía
+       if (!trimmed) {
+
+           currentList = null;
+           currentListType = null;
+
+           return;
+       }
+
+
+       // =================================================
+       // BLOQUE DE CÓDIGO
+       // =================================================
+
+       if (trimmed.startsWith("```")) {
+
+           const codeBlock = document.createElement("pre");
+           const code = document.createElement("code");
+
+           code.classList.add("code-block");
+
+           code.textContent = trimmed.replace(
+               /^```/,
+               ""
+           );
+
+           codeBlock.appendChild(code);
+           container.appendChild(codeBlock);
+
+           return;
+       }
+
+
+       // =================================================
+       // TITULOS
+       // =================================================
+
+       const headingMatch =
+           trimmed.match(/^(#{1,3})\s+(.*)$/);
+
+       if (headingMatch) {
+
+           currentList = null;
+           currentListType = null;
+
+           const level =
+               headingMatch[1].length;
+
+           const heading =
+               document.createElement(`h${level}`);
+
+           formatInlineMarkdown(
+               headingMatch[2],
+               heading
+           );
+
+           container.appendChild(heading);
+
+           return;
+       }
+
+
+       // =================================================
+       // LISTA CON VIÑETAS
+       // =================================================
+
+       const unorderedMatch =
+           trimmed.match(/^[-*]\s+(.*)$/);
+
+       if (unorderedMatch) {
+
+           if (currentListType !== "ul") {
+
+               currentList =
+                   document.createElement("ul");
+
+               currentList.classList.add(
+                   "markdown-list"
+               );
+
+               container.appendChild(
+                   currentList
+               );
+
+               currentListType = "ul";
+           }
+
+           const li =
+               document.createElement("li");
+
+           formatInlineMarkdown(
+               unorderedMatch[1],
+               li
+           );
+
+           currentList.appendChild(li);
+
+           return;
+       }
+
+
+       // =================================================
+       // LISTA NUMERADA
+       // =================================================
+
+       const orderedMatch =
+           trimmed.match(/^\d+\.\s+(.*)$/);
+
+       if (orderedMatch) {
+
+           if (currentListType !== "ol") {
+
+               currentList =
+                   document.createElement("ol");
+
+               currentList.classList.add(
+                   "markdown-list"
+               );
+
+               container.appendChild(
+                   currentList
+               );
+
+               currentListType = "ol";
+           }
+
+           const li =
+               document.createElement("li");
+
+           formatInlineMarkdown(
+               orderedMatch[1],
+               li
+           );
+
+           currentList.appendChild(li);
+
+           return;
+       }
+
+
+       // =================================================
+       // CITA
+       // =================================================
+
+       const quoteMatch =
+           trimmed.match(/^>\s?(.*)$/);
+
+       if (quoteMatch) {
+
+           currentList = null;
+           currentListType = null;
+
+           const blockquote =
+               document.createElement("blockquote");
+
+           formatInlineMarkdown(
+               quoteMatch[1],
+               blockquote
+           );
+
+           container.appendChild(
+               blockquote
+           );
+
+           return;
+       }
+
+
+       // =================================================
+       // LINEA SEPARADORA
+       // =================================================
+
+       if (
+           trimmed === "---" ||
+           trimmed === "***"
+       ) {
+
+           currentList = null;
+           currentListType = null;
+
+           container.appendChild(
+               document.createElement("hr")
+           );
+
+           return;
+       }
+
+
+       // =================================================
+       // PARRAFO
+       // =================================================
+
+       currentList = null;
+       currentListType = null;
+
+       const paragraph =
+           document.createElement("p");
+
+       formatInlineMarkdown(
+           trimmed,
+           paragraph
+       );
+
+       container.appendChild(
+           paragraph
+       );
+   });
+}
+
+
+// =====================================================
+// AGREGAR MENSAJE
+// =====================================================
+
 function addMessage(text, type) {
-   const container = document.createElement("div");
-   container.classList.add("message", type);
 
-   const label = document.createElement("div");
-   label.classList.add("message-label");
-   label.textContent = type === "user" ? "Tú" : "IA";
+   const container =
+       document.createElement("div");
 
-   const content = document.createElement("div");
-   content.classList.add("message-content");
-   content.textContent = text;
+   container.classList.add(
+       "message",
+       type
+   );
+
+   const label =
+       document.createElement("div");
+
+   label.classList.add(
+       "message-label"
+   );
+
+   label.textContent =
+       type === "user"
+           ? "Tú"
+           : "IA";
+
+   const content =
+       document.createElement("div");
+
+   content.classList.add(
+       "message-content"
+   );
+
+
+   // La IA usa Markdown
+   if (type === "assistant") {
+
+       renderMarkdown(
+           text,
+           content
+       );
+
+   }
+
+   // Usuario y otros mensajes
+   else {
+
+       content.textContent = text;
+
+   }
+
 
    container.appendChild(label);
    container.appendChild(content);
+
    messages.appendChild(container);
 
-   messages.scrollTop = messages.scrollHeight;
+   messages.scrollTop =
+       messages.scrollHeight;
 
    return container;
 }
 
+
+// =====================================================
+// NUEVA CONVERSACIÓN
+// =====================================================
+
 function newConversation() {
-   // Eliminar todos los mensajes actuales
+
    messages.innerHTML = "";
 
-   // Limpiar historial conversacional
    conversationHistory = [];
 
-   // Restaurar el saludo inicial
    addMessage(
        "Hola. Soy tu asistente de Inteligencia Artificial. ¿En qué puedo ayudarte?",
        "assistant"
    );
 
-   // Limpiar el campo de texto
    input.value = "";
 
-   // Restaurar el contador
-   characterCount.textContent = "0 / 1000";
+   characterCount.textContent =
+       "0 / 1000";
 
-   // Asegurar que el campo esté disponible
    input.disabled = false;
    sendButton.disabled = false;
 
-   // Colocar el cursor en el campo
    input.focus();
 }
 
-newChatButton.addEventListener("click", newConversation);
 
-form.addEventListener("submit", async (event) => {
-   event.preventDefault();
+newChatButton.addEventListener(
+   "click",
+   newConversation
+);
 
-   const message = input.value.trim();
 
-   if (!message) {
-       return;
-   }
+// =====================================================
+// ENVÍO DEL MENSAJE
+// =====================================================
 
-   addMessage(message, "user");
+form.addEventListener(
+   "submit",
+   async (event) => {
 
-   // Guardar mensaje del usuario
-   conversationHistory.push({
-       role: "user",
-       content: message
-   });
+       event.preventDefault();
 
-   input.value = "";
-   input.disabled = true;
-   sendButton.disabled = true;
+       const message =
+           input.value.trim();
 
-   const loading = addMessage("Pensando...", "loading");
+       if (!message) {
+           return;
+       }
 
-   try {
-       const response = await fetch(API_URL, {
-           method: "POST",
-           headers: {
-               "Content-Type": "application/json"
-           },
-           body: JSON.stringify({
-               message: message,
-               history: conversationHistory
-           })
+
+       // Mostrar mensaje del usuario
+       addMessage(
+           message,
+           "user"
+       );
+
+
+       // Guardar en historial
+       conversationHistory.push({
+           role: "user",
+           content: message
        });
 
-       const data = await response.json();
 
-       loading.remove();
+       input.value = "";
+       input.disabled = true;
+       sendButton.disabled = true;
 
-       // ==========================================
-       // RETO 5 - MANEJO DE ERRORES
-       // ==========================================
 
-       if (!response.ok) {
+       const loading =
+           addMessage(
+               "Pensando...",
+               "loading"
+           );
 
-           let errorMessage;
 
-           switch (response.status) {
+       try {
 
-               case 400:
-                   errorMessage =
-                       "Error 400: Solicitud incorrecta. " +
-                       (data.error ||
-                        "Los datos enviados no son válidos.");
-                   break;
+           const response =
+               await fetch(
+                   API_URL,
+                   {
+                       method: "POST",
 
-               case 403:
-                   errorMessage =
-                       "Error 403: Acceso prohibido. " +
-                       (data.error ||
-                        "No tienes permiso para realizar esta solicitud.");
-                   break;
+                       headers: {
+                           "Content-Type":
+                               "application/json"
+                       },
 
-               case 413:
-                   errorMessage =
-                       "Error 413: Petición demasiado grande. " +
-                       (data.error ||
-                        "La información enviada supera el límite permitido.");
-                   break;
+                       body: JSON.stringify({
+                           message:
+                               message,
 
-               case 500:
-                   errorMessage =
-                       "Error 500: Error interno del servidor. " +
-                       (data.error ||
-                        "No fue posible procesar la solicitud.");
-                   break;
+                           history:
+                               conversationHistory
+                       })
+                   }
+               );
 
-               default:
-                   errorMessage =
-                       `Error ${response.status}: ` +
-                       (data.error ||
-                        "Ocurrió un error inesperado.");
+
+           const data =
+               await response.json();
+
+
+           loading.remove();
+
+
+           // =================================================
+           // MANEJO DE ERRORES
+           // =================================================
+
+           if (!response.ok) {
+
+               let errorMessage;
+
+               switch (
+                   response.status
+               ) {
+
+                   case 400:
+                       errorMessage =
+                           "Error 400: Solicitud incorrecta. " +
+                           (
+                               data.error ||
+                               "Los datos enviados no son válidos."
+                           );
+                       break;
+
+                   case 403:
+                       errorMessage =
+                           "Error 403: Acceso prohibido. " +
+                           (
+                               data.error ||
+                               "El origen de la solicitud no está autorizado."
+                           );
+                       break;
+
+                   case 413:
+                       errorMessage =
+                           "Error 413: Petición demasiado grande. " +
+                           (
+                               data.error ||
+                               "La información enviada supera el límite permitido."
+                           );
+                       break;
+
+                   case 500:
+                       errorMessage =
+                           "Error 500: Error interno del servidor. " +
+                           (
+                               data.error ||
+                               "No fue posible procesar la solicitud."
+                           );
+                       break;
+
+                   default:
+                       errorMessage =
+                           `Error ${response.status}: ` +
+                           (
+                               data.error ||
+                               "Ocurrió un error inesperado."
+                           );
+               }
+
+
+               throw new Error(
+                   errorMessage
+               );
            }
 
-           throw new Error(errorMessage);
+
+           // =================================================
+           // RESPUESTA DE LA IA
+           // =================================================
+
+           addMessage(
+               data.reply,
+               "assistant"
+           );
+
+
+           // Guardar respuesta
+           conversationHistory.push({
+               role: "assistant",
+               content: data.reply
+           });
+
+
        }
+       catch (error) {
 
-       // ==========================================
-       // RESPUESTA CORRECTA
-       // ==========================================
+           if (
+               loading.parentNode
+           ) {
+               loading.remove();
+           }
 
-       addMessage(data.reply, "assistant");
 
-       // Guardar respuesta de la IA
-       conversationHistory.push({
-           role: "assistant",
-           content: data.reply
-       });
+           addMessage(
+               error.message,
+               "assistant"
+           );
 
-   }
-   catch (error) {
-
-       // Evitar error si loading ya no existe
-       if (loading.parentNode) {
-           loading.remove();
        }
+       finally {
 
-       addMessage(
-           error.message,
-           "assistant"
-       );
-   }
+           input.disabled = false;
+           sendButton.disabled = false;
 
-   finally {
-       input.disabled = false;
-       sendButton.disabled = false;
-       input.focus();
+           input.focus();
+       }
    }
-});
+);

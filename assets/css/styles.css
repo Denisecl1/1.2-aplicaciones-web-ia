@@ -196,3 +196,115 @@ body {
         max-width: 90%;
     }
 }
+
+/* ==========================================
+   FORMATO DE RESPUESTAS DE LA IA
+   ========================================== */
+
+.message-content p {
+    margin: 0 0 12px 0;
+    line-height: 1.7;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* Títulos */
+
+.message-content h1 {
+    font-size: 24px;
+    margin: 8px 0 14px;
+    font-weight: 700;
+}
+
+.message-content h2 {
+    font-size: 20px;
+    margin: 18px 0 10px;
+    font-weight: 700;
+}
+
+.message-content h3 {
+    font-size: 17px;
+    margin: 15px 0 8px;
+    font-weight: 700;
+}
+
+
+/* Negritas */
+
+.message-content strong {
+    font-weight: 800;
+}
+
+
+/* Cursivas */
+
+.message-content em {
+    font-style: italic;
+}
+
+
+/* Listas */
+
+.message-content ul,
+.message-content ol {
+    margin: 10px 0 14px 24px;
+    padding-left: 18px;
+}
+
+.message-content li {
+    margin-bottom: 7px;
+    line-height: 1.6;
+}
+
+
+/* Citas */
+
+.message-content blockquote {
+    margin: 12px 0;
+    padding: 10px 14px;
+    border-left: 4px solid currentColor;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+
+/* Línea separadora */
+
+.message-content hr {
+    margin: 16px 0;
+    border: none;
+    border-top: 1px solid currentColor;
+    opacity: 0.3;
+}
+
+
+/* Código pequeño */
+
+.message-content code {
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-family: monospace;
+    background: rgba(128, 128, 128, 0.2);
+}
+
+
+/* Bloques de código */
+
+.message-content pre {
+    margin: 14px 0;
+    padding: 14px;
+    overflow-x: auto;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.message-content .code-block {
+    display: block;
+    background: transparent;
+    padding: 0;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
